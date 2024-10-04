@@ -8,20 +8,38 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from movies.models import movies as Movie
+from rest_framework import filters
+from rest_framework.pagination import PageNumberPagination #this makes me import to allow pagination
 # Create your views here.
 
-class ListMovie(generics.ListCreateAPIView):
+#the below code is what helps to handle pagination. This class defines the pagination settings, such as the page size, page size query parameter, and maximum page size.
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class moviesListCreateAPIview(generics.ListCreateAPIView):
     queryset = models.movies.objects.all()
     serializer_class = moviesSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] #below is the ordering and filter i added
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['rating', 'created_at']
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'rating']
+    pagination_class = StandardResultsSetPagination #the pagination class i used
     def get_queryset(self):
         queryset = self.queryset.all()
-        rating_filter = self.request.query_params.get('rating', None)
+        rating_filter = self.request.query_params.get('rating')
         if rating_filter is not None:
             queryset = queryset.filter(rating__icontains=rating_filter)
         return queryset
+    
+    # def get(self, request):
+    #     # Only authenticated users can access this view
+    #     return Response({'message': 'Hello, authenticated user!'})
 
-class DetailMovie(generics.RetrieveUpdateDestroyAPIView):
+class moviesRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.movies.objects.all()
     serializer_class = moviesSerializer
     permission_classes = [IsAdminUser]
@@ -36,6 +54,9 @@ class DetailMovie(generics.RetrieveUpdateDestroyAPIView):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = models.movies.objects.all()
     serializer_class = moviesSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['rating', 'created_at']
+    ordering = ['rating']
 
 
 #API END POINTS BELOW

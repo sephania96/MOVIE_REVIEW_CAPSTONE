@@ -37,12 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'movies',
     'accounts',
     'rest_framework',
-    'movie_api',
-    'rest_framework.authtoken',
-    'drf_yasg',
+    'reviews_api',
 ]
 
 REST_FRAMEWORK = {

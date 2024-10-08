@@ -37,6 +37,6 @@ class Users(models.Model):
     pic  = models.ImageField(upload_to='profile_pics', blank=True)
     bio = models.TextField(max_length=500, blank=True)
     country = models.CharField(max_length=100, default='Unknown')
-    review_by = models.OneToOneField(CustomUser , on_delete=models.CASCADE, related_name='users', null=True)
+    review_by = models.ForeignKey(CustomUser , on_delete=models.CASCADE, related_name='users', null=True)
     
     # review_by = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)

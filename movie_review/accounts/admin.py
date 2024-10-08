@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ["email", "username",] #below is an additional features i added . im yet to use
+    list_display = ["email", "username"] #below is an additional features i added . im yet to use
     search_fields = ["email", "username"]
     filter_horizontal = ["groups", "user_permissions"]
 

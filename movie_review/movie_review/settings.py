@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'movie_api',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {

@@ -11,6 +11,10 @@ from .paginations import ReviewPagination
 from rest_framework import filters
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import ReviewFilter
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -59,7 +63,7 @@ class ReviewList(generics.ListCreateAPIView):
     pagination_class = ReviewPagination
 
     # Adding the search and filtering backends
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter] 
     
     # Allowing searching by movie title
     search_fields = ['movie__title']  # Searching in the related 'movie' field
@@ -67,6 +71,8 @@ class ReviewList(generics.ListCreateAPIView):
     
     # Allowing filtering by rating
     filterset_fields = ['rating']  # Optional filtering by rating (1-5)
+    filterset_class = ReviewFilter
+    # Allowing ordering by rating or date_created
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of reviews or create a new review",

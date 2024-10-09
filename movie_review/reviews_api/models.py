@@ -4,6 +4,7 @@ from django.utils.timezone import now
 from django.utils import timezone
 from django.conf import settings
 from accounts.models import CustomUser
+import django_filters
 # Create your models here.
 
 
@@ -35,6 +36,15 @@ class Review(models.Model):
     stars = models.IntegerField(choices=rate_choices)
     comment = models.TextField(max_length=4000)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+
+class ReviewFilter(django_filters.FilterSet):
+    # Assuming 'rating' is a field on a related 'Movie' model
+    rating = django_filters.NumberFilter(field_name='movie__rating')
+
+    class Meta:
+        model = Review
+        
+        fields = [] 
 
     def __str__(self):
         if self.user:

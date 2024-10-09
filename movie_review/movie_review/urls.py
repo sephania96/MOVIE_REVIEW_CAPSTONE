@@ -23,7 +23,7 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Movie Review API",
+        title="Movie Review API DESIGNED BY SEPHANIA",
         default_version='v1',
         description="API documentation for Movie and Review",
         terms_of_service="https://www.google.com/policies/terms/",

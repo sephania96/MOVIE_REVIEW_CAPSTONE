@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from django.utils import timezone
 from django.conf import settings
+from accounts.models import CustomUser
 # Create your models here.
 
 
@@ -21,7 +22,7 @@ class Movie(models.Model):
 
 class Review(models.Model):
     author = models.CharField(max_length=40, blank=True, null=True, default="anonymous")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)  # Use CustomUser
     review_date = models.DateTimeField(default=timezone.now)
     rate_choices = (
         (1,1),

@@ -13,7 +13,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id','title']  # Fields I will be showing
+        fields = ['id','title','movie_type']  # Fields I will be showing
 
 # Serializer for Review
 class ReviewSerializer(serializers.ModelSerializer):
@@ -39,3 +39,4 @@ class ReviewSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             validated_data['user'] = request.user
         return super().update(instance, validated_data)
+    

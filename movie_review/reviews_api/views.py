@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Movie, Review, User
-from .serializers import MovieSerializer, ReviewSerializer
+from .models import Movie, Review, CustomUser
+from .serializers import MovieSerializer, ReviewSerializer, CustomUserSerializer
 # Create your views here.
 
 class MovieList(generics.ListCreateAPIView):
@@ -23,3 +23,12 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
+
+class UserList(generics.ListAPIView):  # new
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):  # new
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer

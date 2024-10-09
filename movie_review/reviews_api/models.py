@@ -11,6 +11,7 @@ from accounts.models import CustomUser
 
 class Movie(models.Model):
     title = models.CharField(max_length=40)
+    movie_type = models.CharField(max_length=20)
     description =  models.TextField(max_length=3000)
     title_upload_date = models.DateTimeField(default=timezone.now)
 

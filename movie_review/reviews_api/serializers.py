@@ -13,7 +13,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id', 'title', 'description', 'title_upload_date']  # Fields you want to expose
+        fields = ['id','title']  # Fields I will be showing
 
 # Serializer for Review
 class ReviewSerializer(serializers.ModelSerializer):

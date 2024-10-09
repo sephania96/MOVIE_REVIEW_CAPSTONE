@@ -13,7 +13,7 @@ class Movie(models.Model):
     title = models.CharField(max_length=40)
     movie_type = models.CharField(max_length=20, default="Action")
     description =  models.TextField(max_length=3000)
-    title_upload_date = models.DateTimeField(default=timezone.now)
+    title_upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
@@ -24,7 +24,7 @@ class Movie(models.Model):
 class Review(models.Model):
     author = models.CharField(max_length=40, blank=True, null=True, default="anonymous")
     user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)  # Use CustomUser
-    review_date = models.DateTimeField(default=timezone.now)
+    review_date = models.DateTimeField(auto_now_add=True)
     rate_choices = (
         (1,1),
         (2,2),

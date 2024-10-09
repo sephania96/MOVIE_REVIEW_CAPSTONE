@@ -7,6 +7,8 @@ urlpatterns = [
     path("movies/<int:pk>/", views.MovieDetail.as_view()),
     path("reviews/", views.ReviewList.as_view()),
     path("reviews/<int:pk>/", views.ReviewDetail.as_view()),
+    path("users/", views.UserList.as_view()),
+    path("users/<int:pk>/", views.UserDetail.as_view()),
 ]
 
 #This is to allow the API to accept different formats

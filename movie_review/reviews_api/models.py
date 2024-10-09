@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from django.utils import timezone
+from django.conf import settings
 # Create your models here.
 
 
@@ -11,7 +12,6 @@ class Movie(models.Model):
     title = models.CharField(max_length=40)
     description =  models.TextField(max_length=3000)
     title_upload_date = models.DateTimeField(default=timezone.now)
-    movie_cover = models.FileField(upload_to='')
 
     def __str__(self):
         return self.title
@@ -20,7 +20,8 @@ class Movie(models.Model):
 
 
 class Review(models.Model):
-    author = models.CharField(max_length=40, default="anonymous")
+    author = models.CharField(max_length=40, blank=True, null=True, default="anonymous")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     review_date = models.DateTimeField(default=timezone.now)
     rate_choices = (
         (1,1),
@@ -34,4 +35,6 @@ class Review(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.movie.title
+        if self.user:
+            return f"{self.user.username}'s review of {self.movie.title}"
+        return f"{self.author}'s review of {self.movie.title}"

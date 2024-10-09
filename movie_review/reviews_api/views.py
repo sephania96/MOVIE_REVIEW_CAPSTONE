@@ -4,12 +4,12 @@ from .models import Movie, Review, User
 from .serializers import MovieSerializer
 # Create your views here.
 
-class movieList(generics.ListCreateAPIView):
+class MovieList(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
 
-class movieDetail(generics.RetrieveUpdateDestroyAPIView):
+class MovieDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 

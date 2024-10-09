@@ -9,6 +9,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse  # new
 from .paginations import ReviewPagination
 from rest_framework import filters
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 # Create your views here.
 
@@ -18,11 +20,33 @@ class MovieList(generics.ListCreateAPIView):
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    @swagger_auto_schema(
+        operation_description="Retrieve a list of movies or create a new movie",
+        responses={200: MovieSerializer(many=True)}
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Create a new movie",
+        request_body=MovieSerializer,
+        responses={201: MovieSerializer}
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
 
 class MovieDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  # new
+
+    @swagger_auto_schema(
+        operation_description="Retrieve, update or delete a movie",
+        responses={200: MovieSerializer}
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -43,6 +67,25 @@ class ReviewList(generics.ListCreateAPIView):
     
     # Allowing filtering by rating
     filterset_fields = ['rating']  # Optional filtering by rating (1-5)
+
+    @swagger_auto_schema(
+        operation_description="Retrieve a list of reviews or create a new review",
+        responses={200: ReviewSerializer(many=True)}
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Create a new review",
+        request_body=ReviewSerializer,
+        responses={201: ReviewSerializer}
+    )
+
+
+
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
     
     def get_queryset(self):
         queryset = Review.objects.all()  # Base queryset for all reviews
@@ -71,6 +114,15 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]  # Consider adding custom permissions
+
+
+    @swagger_auto_schema(
+        operation_description="Retrieve, update or delete a review",
+        responses={200: ReviewSerializer}
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
     def get_object(self, pk):
         try:

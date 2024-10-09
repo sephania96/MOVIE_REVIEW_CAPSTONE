@@ -39,7 +39,7 @@ class CustomUser(AbstractUser):
 
 # User Profile Model (optional additional fields)
 class Users(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile', default=1)
     pic = models.ImageField(upload_to='profile_pics', blank=True)
     bio = models.TextField(max_length=500, blank=True)
     country = models.CharField(max_length=100, default='Unknown')

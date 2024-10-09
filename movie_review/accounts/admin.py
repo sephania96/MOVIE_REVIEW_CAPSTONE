@@ -23,7 +23,6 @@ admin.site.register(CustomUser, CustomUserAdmin)
 from .models import Users
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ["review_by", "bio", "country"]
-    search_fields = ["review_by__email", "review_by__username"]
+    list_display = ['user', 'bio', 'country']  # Use 'user', which is the field in the Users model
 
 admin.site.register(Users, ProfileAdmin)

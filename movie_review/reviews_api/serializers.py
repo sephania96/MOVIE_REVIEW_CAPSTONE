@@ -17,9 +17,25 @@ class MovieSerializer(serializers.ModelSerializer):
 
 # Serializer for Review
 class ReviewSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer(read_only=True)  # Nested serializer for my user details
-    movie = MovieSerializer(read_only=True)  # Optionally, you can nest the Movie serializer too
+    user = CustomUserSerializer(read_only=True)  # Display user info in GET requests
+    movie = MovieSerializer(read_only=True)  # Display movie info in GET requests
+    movie_id = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all(), source='movie', write_only=True)
+    
+    # For POST requests, accept user_id and movie_id
+    user_id = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), source='user', write_only=True, required=False)
 
     class Meta:
         model = Review
-        fields = ['id', 'author', 'user', 'review_date', 'stars', 'comment', 'movie']
+        fields = ['id', 'author', 'user', 'user_id', 'review_date', 'stars', 'comment', 'movie', 'movie_id']
+
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            validated_data['user'] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            validated_data['user'] = request.user
+        return super().update(instance, validated_data)

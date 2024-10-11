@@ -16,7 +16,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id','title','movie_type']  # Fields I will be showing
+        fields = ['id','title','genre','release_date']  # Fields I will be showing
 
 # Serializer for Review
 class ReviewSerializer(serializers.ModelSerializer):
@@ -40,7 +40,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'author', 'user', 'user_id','review_date', 'stars', 'comment', 'movie', 'movie_id']
+        fields = ['id', 'author', 'user','review_date', 'stars', 'comment','movie']
+        # fields = ['id', 'author', 'user', 'user_id','review_date', 'stars', 'comment', 'movie', 'movie_id']
 
     def create(self, validated_data):
         request = self.context.get('request', None)

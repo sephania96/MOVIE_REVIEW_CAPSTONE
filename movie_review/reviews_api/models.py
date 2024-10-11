@@ -12,7 +12,7 @@ import django_filters
 
 class Movie(models.Model):
     title = models.CharField(max_length=40)
-    genre = models.CharField(max_length=255, blank=True, null=True, default='Action')
+    genre = models.CharField(max_length=255, blank=True, null=True)
     release_date = models.DateField(blank=True, null=True)
     # movie_type = models.CharField(max_length=20, default="Action")
     # description =  models.TextField(max_length=3000)

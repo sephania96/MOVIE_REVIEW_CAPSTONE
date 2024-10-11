@@ -14,7 +14,7 @@ class Command(BaseCommand):
         # Define your search parameters
         params = {
             'api_key': api_key,
-            'query': 'Captain America',  # Example movie title
+            'query': 'Interstellar',  # Example movie title
             'language': 'en-US',
             'page': 1,
             'include_adult': False

@@ -17,6 +17,7 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ['id','title','genre','release_date']  # Fields I will be showing
+        
 
 # Serializer for Review
 class ReviewSerializer(serializers.ModelSerializer):

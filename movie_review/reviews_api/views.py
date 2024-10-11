@@ -15,7 +15,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import ReviewFilter
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-
+from django.contrib.postgres.search import SearchVector
+from .filters import MovieFilter
 # Create your views here.
 
 
@@ -23,6 +24,39 @@ class MovieList(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MovieFilter
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter] 
+    queryset = Movie.objects.all().order_by('title')
+    ordering_fields = ['title', 'release_date', 'genre']  # Allow ordering by these fields
+    ordering = ['title']
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.annotate(
+                search=SearchVector('title', 'genre', 'release_date')
+            ).filter(search=search_query)
+        return queryset
+
+
+
+
+    # # Allowing searching by movie title
+    # search_fields = ['movie__title']  # Searching in the related 'movie' field
+    # search_param = 'title'
+    
+    # # Allowing filtering by rating
+    # filterset_fields = ['title']  # Optional filtering by rating (1-5)
+
+    # def get_queryset(self):
+    #     queryset = Movie.objects.all()
+    #     query = self.request.query_params.get('search', None)
+    #     if query:
+    #         queryset = queryset.annotate(
+    #             search=SearchVector('title', 'genre'),
+    #         ).filter(search=query)
+    #     return queryset
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of movies or create a new movie",

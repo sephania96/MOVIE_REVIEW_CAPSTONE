@@ -8,13 +8,13 @@ class Command(BaseCommand):
     help = 'Fetch movies from TMDb API'
 
     def handle(self, *args, **kwargs):
-        api_key = '12'
+        api_key = 'API-KEY'
         url = 'https://api.themoviedb.org/3/search/movie'
 
         # Define your search parameters
         params = {
             'api_key': api_key,
-            'query': 'Interstellar',  # Example movie title
+            'query': 'The Matrix',  # Example movie title
             'language': 'en-US',
             'page': 1,
             'include_adult': False

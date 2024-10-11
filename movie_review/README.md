@@ -1,4 +1,4 @@
-Here’s a comprehensive **README** for your **Movie Review API** project. This README covers the project setup, features, API endpoints, and more.
+Here’s a comprehensive **README** for my **Movie Review API** project. This README covers the project setup, features, API endpoints, and more.
 
 ---
 
@@ -6,24 +6,24 @@ Here’s a comprehensive **README** for your **Movie Review API** project. This 
 
 ## **Overview**
 
-The Movie Review API allows users to create, read, update, and delete movie entries and reviews. Users can register and log in to manage their movies and reviews, while anonymous users can post reviews without authentication. The API also features a user profile management system for authenticated users. The platform is built using Django and Django REST Framework (DRF), with JWT authentication for secure access to endpoints.
+The Movie Review API allows users to create, read, update, and delete movie entries and reviews. Users can register and log in to manage their movies and reviews, while anonymous users can post reviews without authentication. The API also features a user profile management system for authenticated users. The platform is built using Python,Django and Django REST Framework (DRF), basic authentication for secure access to endpoints.
 
 ## **Features**
 - **Movie Management**: Users can create, update, delete, and view movies.
 - **Review Management**: Users (authenticated or anonymous) can post reviews with star ratings.
-- **User Authentication**: JWT-based authentication allows users to securely log in and manage their content.
-- **User Profiles**: Authenticated users can manage their profiles, including profile pictures and bio.
+- **User Authentication**: I made JWT-based authentication optional but it allows users to securely log in and manage their content.
+- **User Profiles**: Authenticated Admin can manage their profiles, including profile pictures and bio.
 - **Search and Filtering**: Search functionality is provided for movies and reviews.
 
 ---
 
 ## **Technologies Used**
-- **Backend**: Django, Django REST Framework (DRF)
+- **Backend**: Python, Django, Django REST Framework (DRF)
 - **Authentication**: JWT (JSON Web Token) using `djangorestframework-simplejwt`
-- **Database**: SQLite (Development), PostgreSQL (Production)
+- **Database**: SQLite (Development)
 - **Documentation**: Swagger (using `drf-yasg`)
 - **File Handling**: Django `ImageField` for profile pictures
-- **Deployment**: Heroku or AWS (Production)
+- **Deployment**: pythonanywhere.com
 
 ---
 
@@ -33,22 +33,18 @@ The Movie Review API allows users to create, read, update, and delete movie entr
 
 - Python 3.8+
 - Django 4.x
-- PostgreSQL (for production)
-- Virtual Environment (optional but recommended)
+- Virtual Environment 
 
 ### **Installation**
 
 1. **Clone the Repository**:
-   ```bash
    git clone https://github.com/your-username/movie-review-api.git
    cd movie-review-api
-   ```
+   
 
 2. **Create and Activate a Virtual Environment**:
-   ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
 
 3. **Install Dependencies**:
    ```bash
@@ -104,9 +100,9 @@ The Movie Review API allows users to create, read, update, and delete movie entr
 - **PUT** `/api/profile/`: Update the authenticated user's profile
 
 ### **5. Authentication Endpoints**
-- **POST** `/api/auth/login/`: Obtain JWT token
-- **POST** `/api/auth/refresh/`: Refresh JWT token
-- **POST** `/api/auth/register/`: Register a new user
+- **POST** `/api/auth/login/`: Obtain JWT token #This is optional
+- **POST** `/api/auth/refresh/`: Refresh JWT token #This is optional
+- **POST** `/api/auth/signup/`: Register a new user
 
 ### **6. Search and Filtering**
 - **GET** `/api/movies/?search={query}`: Search for movies by title, description
@@ -116,7 +112,7 @@ The Movie Review API allows users to create, read, update, and delete movie entr
 
 ## **Authentication**
 
-The API uses JWT (JSON Web Token) for authentication. To access protected endpoints, include the JWT token in the `Authorization` header.
+The API uses Basic authentication for authentication. But To access protected endpoints, include the JWT token in the `Authorization` header.
 
 Example:
 
@@ -173,22 +169,13 @@ python manage.py test
 
 ---
 
-## **Deployment**
+Deployment
 
-To deploy this API to a production environment such as Heroku or AWS, follow these steps:
+To deployment was done using pythonanywhere.com
 
-1. **Set up a PostgreSQL database** and configure the `DATABASE_URL` in your `.env` file.
-2. **Set `DEBUG=False`** in your environment settings.
-3. **Collect static files**:
-   ```bash
-   python manage.py collectstatic
-   ```
-4. Deploy to Heroku or your preferred cloud provider.
 
----
+Project Structure
 
-## **Project Structure**
-```
 movie_review_api/
 │
 ├── accounts/             # CustomUser user models
@@ -200,5 +187,5 @@ movie_review_api/
 ├── requirements.txt      # Python dependencies
 └── README.md             # Project README documentation
 
----
+
 

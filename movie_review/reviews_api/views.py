@@ -93,7 +93,7 @@ class MovieDetail(generics.RetrieveUpdateDestroyAPIView):
 class ReviewList(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     pagination_class = ReviewPagination
 
     # Adding the search and filtering backends

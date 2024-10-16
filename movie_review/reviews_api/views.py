@@ -17,9 +17,10 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchVector
 from .filters import MovieFilter
+from rest_framework.exceptions import PermissionDenied
 # Create your views here.
 
-
+# View for listing and creating movies
 class MovieList(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
@@ -28,8 +29,8 @@ class MovieList(generics.ListCreateAPIView):
     filterset_class = MovieFilter
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter] 
     queryset = Movie.objects.all().order_by('title')
-    ordering_fields = ['title', 'release_date', 'genre']  # Allow ordering by these fields
-    ordering = ['title']
+    ordering_fields = ['title', 'release_date', 'genre', 'id']  # Allow ordering by these fields
+    ordering = ['title','id']
     def get_queryset(self):
         queryset = super().get_queryset()
         search_query = self.request.query_params.get('search', None)
@@ -39,24 +40,6 @@ class MovieList(generics.ListCreateAPIView):
             ).filter(search=search_query)
         return queryset
 
-
-
-
-    # # Allowing searching by movie title
-    # search_fields = ['movie__title']  # Searching in the related 'movie' field
-    # search_param = 'title'
-    
-    # # Allowing filtering by rating
-    # filterset_fields = ['title']  # Optional filtering by rating (1-5)
-
-    # def get_queryset(self):
-    #     queryset = Movie.objects.all()
-    #     query = self.request.query_params.get('search', None)
-    #     if query:
-    #         queryset = queryset.annotate(
-    #             search=SearchVector('title', 'genre'),
-    #         ).filter(search=query)
-    #     return queryset
 
     @swagger_auto_schema(
         operation_description="Retrieve a list of movies or create a new movie",
@@ -74,52 +57,63 @@ class MovieList(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
+# View for retrieving, updating, and deleting a specific movie
 class MovieDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # new
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(
         operation_description="Retrieve, update or delete a movie",
         responses={200: MovieSerializer}
     )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    def get(self, request, pk, format=None):
+        return super().get(request, pk, format)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def put(self, request, pk, format=None):
+        movie = get_object_or_404(Movie, pk=pk)
+        # Allow users to update the genre of any movie
+        if 'genre' in request.data:
+            serializer = self.get_serializer(movie, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise PermissionDenied("You can only update the genre of the movie.")
 
+    def perform_destroy(self, instance):
+        # Only allow admin to delete movies
+        if self.request.user.is_staff:
+            instance.delete()
+        else:
+            raise PermissionDenied("You do not have permission to delete this movie.")
 
+# View for listing and creating reviews
 class ReviewList(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = ReviewPagination
-
-    # Adding the search and filtering backends
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter] 
-    
-    # Allowing searching by movie title
     search_fields = ['movie__title']  # Searching in the related 'movie' field
     search_param = 'movie_title'
-    
-    # Allowing filtering by rating
     filterset_fields = ['rating']  # Optional filtering by rating (1-5)
     filterset_class = ReviewFilter
     # Allowing ordering by rating or date_created
 
-    @swagger_auto_schema(
-        operation_description="Retrieve a list of reviews or create a new review",
-        responses={200: ReviewSerializer(many=True)}
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    # @swagger_auto_schema(
+    #     operation_description="Retrieve a list of reviews or create a new review",
+    #     responses={200: ReviewSerializer(many=True)}
+    # )
+    # def get(self, request, *args, **kwargs):
+    #     return super().get(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_description="Create a new review",
-        request_body=ReviewSerializer,
-        responses={201: ReviewSerializer}
-    )
+    # @swagger_auto_schema(
+    #     operation_description="Create a new review",
+    #     request_body=ReviewSerializer,
+    #     responses={201: ReviewSerializer}
+    # )
 
 
 
@@ -150,44 +144,62 @@ class ReviewList(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# View for retrieving, updating, and deleting a specific review
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]  # Consider adding custom permissions
-
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(
         operation_description="Retrieve, update or delete a review",
         responses={200: ReviewSerializer}
     )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-    def get_object(self, pk):
-        try:
-            return Review.objects.get(pk=pk)
-        except Review.DoesNotExist:
-            raise Http404
-
     def get(self, request, pk, format=None):
-        review = self.get_object(pk)
-        serializer = ReviewSerializer(review)
-        return Response(serializer.data)
+        return super().get(request, pk, format)
 
     def put(self, request, pk, format=None):
-        review = self.get_object(pk)
-        serializer = ReviewSerializer(review, data=request.data)
+        review = get_object_or_404(Review, pk=pk)
+        # Check if the user is the author of the review
+        if request.user != review.author:
+            raise PermissionDenied("You did not submit this review go Back and create a review.")
+        return super().put(request, pk, format)
+
+    def perform_destroy(self, instance):
+        # Check if the user is the author of the review or an admin
+        if self.request.user == instance.author or self.request.user.is_staff:
+            instance.delete()
+        else:
+            # Raise a permission denied error if the user is not authorized
+            raise PermissionDenied("You do not have permission to delete this review.")
+
+class MovieReviewCreateView(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Allow only authenticated users to post reviews
+
+    def post(self, request, *args, **kwargs):
+        movie_id = self.kwargs.get('movie_id')
+        movie = Movie.objects.get(id=movie_id)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            serializer.save(movie=movie)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
-    def delete(self, request, pk, format=None):
-        review = self.get_object(pk)
-        review.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class ReviewCreateView(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can create reviews
 
+    def post(self, request, *args, **kwargs):
+        movie_id = self.kwargs.get('movie_id')  # Get the movie ID from the URL
+        movie = get_object_or_404(Movie, id=movie_id)  # Get the movie or return 404 if not found
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(movie=movie, user=request.user)  # Save the review with the movie and user
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class UserList(generics.ListAPIView):
     queryset = CustomUser.objects.all()

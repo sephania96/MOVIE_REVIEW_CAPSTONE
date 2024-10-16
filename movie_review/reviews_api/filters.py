@@ -9,3 +9,4 @@ class MovieFilter(django_filters.FilterSet):
             'genre': ['exact'],
             'release_date': ['exact', 'year__gt'],  # Example of filtering by year
         }
+

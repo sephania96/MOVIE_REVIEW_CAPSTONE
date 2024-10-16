@@ -8,13 +8,13 @@ class Command(BaseCommand):
     help = 'Fetch movies from TMDb API'
 
     def handle(self, *args, **kwargs):
-        api_key = 'API-Key'
+        api_key = '426e0f0d6d436de1adbe6273d455a8eb'
         url = 'https://api.themoviedb.org/3/search/movie'
 
         # Define your search parameters
         params = {
             'api_key': api_key,
-            'query': 'The Matrix',  # Example movie title
+            'query': 'Mummy',  # Example movie title
             'language': 'en-US',
             'page': 1,
             'include_adult': False
@@ -35,10 +35,14 @@ class Command(BaseCommand):
                         except ValueError:
                             self.stdout.write(self.style.WARNING(f"Invalid date format for movie: {movie_data['title']}"))
 
+                    # Fetch detailed movie information to get genres
+                    movie_id = movie_data['id']
+                    genre = self.get_movie_genre(api_key, movie_id)
+
                     movie, created = Movie.objects.get_or_create(
                         title=movie_data['title'],
                         defaults={
-                            'genre': ', '.join(genre['name'] for genre in movie_data.get('genres', [])),
+                            'genre': genre,
                             'release_date': release_date,
                         }
                     )
@@ -50,4 +54,17 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR('No movies found'))
         else:
             self.stdout.write(self.style.ERROR(f'Failed to fetch data from TMDb API: {response.status_code}'))
-            self.stdout.write(response.text)  # Print the response text for more details
+            self.stdout.write(response.text)
+
+    def get_movie_genre(self, api_key, movie_id):
+        """Fetch the genre of a movie using its ID."""
+        url = f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US'
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            movie_details = response.json()
+            genres = [genre['name'] for genre in movie_details.get('genres', [])]
+            return ', '.join(genres)  # Return genres as a comma-separated string
+        else:
+            self.stdout.write(self.style.ERROR(f'Failed to fetch genre for movie ID {movie_id}: {response.status_code}'))
+            return "Unknown"

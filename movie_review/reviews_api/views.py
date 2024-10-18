@@ -223,3 +223,32 @@ def api_root(request, format=None):
             "movies": reverse("movies-list", request=request, format=format),
         }
     )
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Movie
+from .serializers import MovieSerializer
+from .fetch_api import fetch_movies_from_api  # Import the function
+
+class MovieListView(APIView):
+    def get(self, request):
+        search_query = request.query_params.get('search', None)  # Get the search query parameter
+        movies = fetch_movies_from_api()  # Call the function to fetch movies
+        
+        # Process and save the movies to the database
+        for movie_data in movies:
+            Movie.objects.get_or_create(
+                title=movie_data['title'],
+                release_date=movie_data['release_date'],
+                genre=movie_data['genre_ids'],  # Adjust based on your model
+            )
+        
+        # Filter movies based on the search query
+        if search_query:
+            movie_objects = Movie.objects.filter(title__icontains=search_query)  # Case-insensitive search
+        else:
+            movie_objects = Movie.objects.all()  # Return all movies if no search query
+        
+        # Serialize the movie data to return as a response
+        serializer = MovieSerializer(movie_objects, many=True)
+        return Response(serializer.data)

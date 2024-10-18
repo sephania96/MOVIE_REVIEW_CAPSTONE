@@ -152,3 +152,26 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+#below is for the movie fetch 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'reviews_api': {  # Replace 'your_app' with your actual app name
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+    },
+}
+
+TMDB_API_KEY = '426e0f0d6d436de1adbe6273d455a8eb'

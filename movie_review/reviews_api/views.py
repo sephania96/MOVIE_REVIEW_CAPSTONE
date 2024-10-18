@@ -100,23 +100,6 @@ class ReviewList(generics.ListCreateAPIView):
     search_param = 'movie_title'
     filterset_fields = ['rating']  # Optional filtering by rating (1-5)
     filterset_class = ReviewFilter
-    # Allowing ordering by rating or date_created
-
-    # @swagger_auto_schema(
-    #     operation_description="Retrieve a list of reviews or create a new review",
-    #     responses={200: ReviewSerializer(many=True)}
-    # )
-    # def get(self, request, *args, **kwargs):
-    #     return super().get(request, *args, **kwargs)
-
-    # @swagger_auto_schema(
-    #     operation_description="Create a new review",
-    #     request_body=ReviewSerializer,
-    #     responses={201: ReviewSerializer}
-    # )
-
-
-
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -224,11 +207,13 @@ def api_root(request, format=None):
         }
     )
 
+
+#below is for my fetch movie
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Movie
 from .serializers import MovieSerializer
-from .fetch_api import fetch_movies_from_api  # Import the function
+from .fetch_api import fetch_movies_from_api 
 
 class MovieListView(APIView):
     def get(self, request):

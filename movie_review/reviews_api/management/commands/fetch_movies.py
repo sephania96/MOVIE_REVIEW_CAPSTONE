@@ -1,4 +1,4 @@
-# yourapp/management/commands/fetch_movies.py
+
 import requests
 from django.core.management.base import BaseCommand
 from reviews_api.models import Movie
